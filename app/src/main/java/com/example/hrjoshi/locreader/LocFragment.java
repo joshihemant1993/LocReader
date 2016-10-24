@@ -1,6 +1,10 @@
 package com.example.hrjoshi.locreader;
 
 import android.app.Fragment;
+import android.content.Context;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,10 +29,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 public class LocFragment extends Fragment {
-    public LocFragment(){}
+    public LocFragment() {
+    }
 
     private ArrayAdapter<String> mLocAdapter;
 
@@ -46,9 +52,9 @@ public class LocFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id=item.getItemId();
-        if(id==R.id.action_refresh){
-            FetchLandmark fetchLandmark=new FetchLandmark();
+        int id = item.getItemId();
+        if (id == R.id.action_refresh) {
+            FetchLandmark fetchLandmark = new FetchLandmark();
             fetchLandmark.execute();
             return true;
         }
@@ -64,7 +70,7 @@ public class LocFragment extends Fragment {
                 "Museum AAA",
                 "Your home!!!"
         };
-        List<String> landmark = new ArrayList<String >(Arrays.asList(data));
+        List<String> landmark = new ArrayList<String>(Arrays.asList(data));
 
         mLocAdapter = new ArrayAdapter<String>(
                 getActivity(),
@@ -84,7 +90,7 @@ public class LocFragment extends Fragment {
 
     public class FetchLandmark extends AsyncTask<Object, Object, String[]> {
 
-        private final  String LOG_TAG = FetchLandmark.class.getSimpleName();
+        private final String LOG_TAG = FetchLandmark.class.getSimpleName();
 
         @Override
         protected String[] doInBackground(Object... params) {
@@ -92,9 +98,36 @@ public class LocFragment extends Fragment {
             BufferedReader reader = null;
             String landmarkJson = null;
 
+
+            String format = "json";
+            String lists = "geosearch";
+
+            LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+            Criteria criteria = new Criteria();
+            String bestProvider = lm.getBestProvider(criteria, false);
+            Location location;
+
+        /*    location = lm.getLastKnownLocation(bestProvider);
+
+
+            if (location == null){
+                Toast.makeText(getActivity(),"Location Not found",Toast.LENGTH_LONG).show();
+            }
+            double longitude = location.getLongitude();
+            double latitude = location.getLatitude();
+            Log.v(LOG_TAG,"Location" + latitude + longitude);
+        */
             try{
 
-                String baseUrl = "https://en.wikipedia.org/w/api.php?action=query&format=json&list=geosearch&gscoord=47.606209%7C-122.332071&gsradius=10000&gslimit=10";
+                //final String base = "https://en.wikipedia.org/w/api.php?action=query";
+                //final String format_param = "format";
+                //final String list_param = "list";
+
+
+            //    String baseUrl = "https://en.wikipedia.org/w/api.php?action=query&format=json&list=geosearch&gscoord=47.606209%7C-122.332071&gsradius=10000&gslimit=10";
+
+              String baseUrl = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=coordinates%7Cpageimages%7Cpageterms&colimit=50&piprop=thumbnail&pithumbsize=144&pilimit=50&wbptterms=description&generator=geosearch&ggscoord=47.606209%7C-122.332071&ggsradius=10000&ggslimit=50";
                 URL url = new URL(baseUrl);
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -127,10 +160,15 @@ public class LocFragment extends Fragment {
             } catch (IOException e) {
                 Log.e(LOG_TAG,"Error ",e);
                 e.printStackTrace();
-            }  finally {
-                if(urlConnection!=null){
+            } finally {
+
+                if (urlConnection != null) {
                     urlConnection.disconnect();
+                    Log.v(LOG_TAG, "Disconnect");
+                } else {
+                    Log.v(LOG_TAG, "Disconnected");
                 }
+            }
                 if(reader!=null){
                     try{
                         reader.close();
@@ -138,7 +176,7 @@ public class LocFragment extends Fragment {
                         Log.e(LOG_TAG,"Error Closing Stream", e);
                     }
                 }
-            }
+
             try{
             //    Log.v(LOG_TAG, "Trying to call method");
                 return getLandmarkData(landmarkJson);
@@ -159,23 +197,44 @@ public class LocFragment extends Fragment {
 
             //JSONObject batchcomplete = LandmarkJson.getJSONObject("batchcomplete");
             JSONObject queryobject = LandmarkJson.getJSONObject("query");
-            JSONArray pagesArray = queryobject.getJSONArray("pages");
 
-            String[] resultStrs = new String[pagesArray.length()];
+            String[] resultStrs = new String[queryobject.length()];
+            /*
+            JSONArray geoArray = queryobject.getJSONArray("geosearch");
 
-            for(int i=0;i<pagesArray.length();i++){
-                JSONObject pageid = pagesArray.getJSONObject(i);
-                String title = pageid.getString(LD_TITLE);
-                resultStrs[i] = title;
-                 Log.v(LOG_TAG, "title "+title);
+            //JSONArray pagesArray = queryobject.getJSONArray("pages");
+
+            //JSONObject pageObject = queryobject.getJSONObject("pages")
+            String[] resultStrs = new String[geoArray.length()];
+            String[] resultStrs = new String[geoArray.length()];
+            for(int i=0; i<geoArray.length();i++){
+                //JSONObject singleObject = geoArray.getJSONObject(i);
+                JSONObject singleObject = geoArray.getJSONObject(i);
+                resultStrs[i] = singleObject.getString("title");
+                Log.v(LOG_TAG, "Title " + resultStrs[i]);
+            }
+            */
+
+            JSONObject pagesObject = queryobject.getJSONObject("pages");
+            Iterator<String> iterator = pagesObject.keys();
+
+            HashMap<String, String> map = new HashMap<String, String>();
+
+            int i = 0;
+            while(iterator.hasNext()){
+                String key = iterator.next();
+                try{
+                    String value;
+                    value = pagesObject.getString("title");
+                    Log.v(LOG_TAG, "Title is " +value);
+                    map.put(key,value);
+                    resultStrs[i] = value;
+                    i++;
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
             }
 
-
-            for(int i=0;i<5; i++){
-                String title;
-                resultStrs[i]=LandmarkJson.getString("TITLE");
-                Log.v(LOG_TAG,"TITLES"+ resultStrs[i]);
-            }
             return resultStrs;
         }
 
@@ -183,12 +242,10 @@ public class LocFragment extends Fragment {
         protected void onPostExecute(String[] result) {
             if(result!=null){
                 mLocAdapter.clear();
-
                 for(String listlandmark: result){
                     mLocAdapter.add(listlandmark);
                 }
             }
         }
     }
-
 }
