@@ -187,17 +187,14 @@ public class LocFragment extends Fragment {
         }
 
         private String[] getLandmarkData(String landmarkJson) throws JSONException{
-            final String LD_LIST = "list";
-        //    final String LD_LONGITUDE=  "LONGITUDE";
-        //    final String LD_LATITUDE = "LATITUDE";
-            final String LD_TITLE = "title";
 
             JSONObject LandmarkJson = new JSONObject(landmarkJson);
 
             //JSONObject batchcomplete = LandmarkJson.getJSONObject("batchcomplete");
             JSONObject queryobject = LandmarkJson.getJSONObject("query");
 
-            String[] resultStrs = new String[queryobject.length()];
+            //String[] resultStrs = new String[queryobject.length()];
+            ArrayList<String> resultStrs = new ArrayList<String>();
             /*
             JSONArray geoArray = queryobject.getJSONArray("geosearch");
 
@@ -217,9 +214,6 @@ public class LocFragment extends Fragment {
             JSONObject pagesObject = queryobject.getJSONObject("pages");
             Iterator<String> iterator = pagesObject.keys();
 
-            //HashMap<String, String> map = new HashMap<String, String>();
-
-            int i = 0;
             while(iterator.hasNext()){
                 String key = iterator.next();
                 try{
@@ -227,18 +221,17 @@ public class LocFragment extends Fragment {
                     value = (JSONObject) pagesObject.get(key);
                     String title = value.getString("title");
 
-                    String landmark = title.toString();
-
-                    Log.v(LOG_TAG, "Title is " +landmark);
+                    Log.v(LOG_TAG, "Title is " +title);
                 //    map.put(key,value);
-                    resultStrs[i] = landmark;
-                    i++;
+                    resultStrs.add(title);
                 }catch (JSONException e){
                     e.printStackTrace();
                 }
             }
 
-            return resultStrs;
+            String[] resultSet = new String[resultStrs.size()];
+            resultStrs.toArray(resultSet);
+            return resultSet;
         }
 
         @Override
