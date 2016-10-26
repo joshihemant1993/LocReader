@@ -29,7 +29,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -218,17 +217,21 @@ public class LocFragment extends Fragment {
             JSONObject pagesObject = queryobject.getJSONObject("pages");
             Iterator<String> iterator = pagesObject.keys();
 
-            HashMap<String, String> map = new HashMap<String, String>();
+            //HashMap<String, String> map = new HashMap<String, String>();
 
             int i = 0;
             while(iterator.hasNext()){
                 String key = iterator.next();
                 try{
-                    String value;
-                    value = pagesObject.getString("title");
-                    Log.v(LOG_TAG, "Title is " +value);
-                    map.put(key,value);
-                    resultStrs[i] = value;
+                    JSONObject value;
+                    value = (JSONObject) pagesObject.get(key);
+                    String title = value.getString("title");
+
+                    String landmark = title.toString();
+
+                    Log.v(LOG_TAG, "Title is " +landmark);
+                //    map.put(key,value);
+                    resultStrs[i] = landmark;
                     i++;
                 }catch (JSONException e){
                     e.printStackTrace();
