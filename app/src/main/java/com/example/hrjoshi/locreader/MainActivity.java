@@ -18,7 +18,9 @@ public class MainActivity extends AppCompatActivity {
                     .add(R.id.activity_main, new LocFragment())
                     .commit();
         }
+
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
