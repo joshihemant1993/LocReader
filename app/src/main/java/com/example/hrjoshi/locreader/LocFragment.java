@@ -2,6 +2,8 @@ package com.example.hrjoshi.locreader;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -195,22 +197,7 @@ public class LocFragment extends Fragment {
 
             //String[] resultStrs = new String[queryobject.length()];
             ArrayList<String> resultStrs = new ArrayList<String>();
-            /*
-            JSONArray geoArray = queryobject.getJSONArray("geosearch");
-
-            //JSONArray pagesArray = queryobject.getJSONArray("pages");
-
-            //JSONObject pageObject = queryobject.getJSONObject("pages")
-            String[] resultStrs = new String[geoArray.length()];
-            String[] resultStrs = new String[geoArray.length()];
-            for(int i=0; i<geoArray.length();i++){
-                //JSONObject singleObject = geoArray.getJSONObject(i);
-                JSONObject singleObject = geoArray.getJSONObject(i);
-                resultStrs[i] = singleObject.getString("title");
-                Log.v(LOG_TAG, "Title " + resultStrs[i]);
-            }
-            */
-
+            ArrayList<Bitmap> resultImgs = new ArrayList<Bitmap>();
             JSONObject pagesObject = queryobject.getJSONObject("pages");
             Iterator<String> iterator = pagesObject.keys();
 
@@ -224,7 +211,17 @@ public class LocFragment extends Fragment {
                     Log.v(LOG_TAG, "Title is " +title);
                 //    map.put(key,value);
                     resultStrs.add(title);
-                }catch (JSONException e){
+                    JSONObject thumbnail = value.getJSONObject("thumbnail");
+                    String source = thumbnail.getString("source");
+                    Log.v(LOG_TAG,"thumbnail" + source);
+                   URL imgURL = new URL(source);
+                    HttpURLConnection imgConnection = (HttpURLConnection) imgURL.openConnection();
+                    InputStream inputStream = imgConnection.getInputStream();
+                    Bitmap bit = BitmapFactory.decodeStream(inputStream);
+                    resultImgs.add(bit);
+                    Log.v(LOG_TAG, "Image is" + bit);
+
+                }catch (Exception e){
                     e.printStackTrace();
                 }
             }
