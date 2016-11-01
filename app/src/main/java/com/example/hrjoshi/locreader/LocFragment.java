@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import org.json.JSONException;
@@ -27,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -54,6 +56,7 @@ public class LocFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        ImageView img = R.id.
         if (id == R.id.action_refresh) {
             FetchLandmark fetchLandmark = new FetchLandmark();
             fetchLandmark.execute();
@@ -89,7 +92,126 @@ public class LocFragment extends Fragment {
 
     }
 
-    public class FetchLandmark extends AsyncTask<Object, Object, String[]> {
+    public class FetchImage extends AsyncTask<String, Object, Bitmap[]> {
+        private final String LOG_TAG = FetchImage.class.getSimpleName();
+        private final WeakReference<ImageView> imageViewReference;
+        private int data = 0;
+
+        public FetchImage(ImageView imageView) {
+            // Use a WeakReference to ensure the ImageView can be garbage collected
+            imageViewReference = new WeakReference<ImageView>(imageView);
+        }
+
+        @Override
+        protected Bitmap[] doInBackground(String... params) {
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+            String landmarkJson = null;
+            String baseUrl = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=coordinates%7Cpageimages%7Cpageterms&colimit=50&piprop=thumbnail&pithumbsize=144&pilimit=50&wbptterms=description&generator=geosearch&ggscoord=47.606209%7C-122.332071&ggsradius=10000&ggslimit=50";
+            URL url = null;
+            try {
+                url = new URL(baseUrl);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    // Nothing to do.
+                    return null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                    // But it does make debugging a *lot* easier if you print out the completed
+                    // buffer for debugging.
+                    buffer.append(line + "\n");
+                }
+
+                if (buffer.length() == 0) {
+                    // Stream was empty.  No point in parsing.
+                    return null;
+                }
+                landmarkJson = buffer.toString();
+
+                Log.v(LOG_TAG, "Landmark String: " + landmarkJson);
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                    Log.v(LOG_TAG, "Disconnect");
+                } else {
+                    Log.v(LOG_TAG, "Disconnected");
+                }
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (final IOException e) {
+                    Log.e(LOG_TAG, "Error Closing Stream", e);
+                }
+            }
+
+            try {
+                //    Log.v(LOG_TAG, "Trying to call method");
+                return getLandmarkImage(landmarkJson);
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        private Bitmap[] getLandmarkImage(String landmarkJson) throws JSONException {
+            JSONObject LandmarkJson = new JSONObject(landmarkJson);
+
+            JSONObject queryobject = LandmarkJson.getJSONObject("query");
+
+            ArrayList<Bitmap> resultImgs = new ArrayList<Bitmap>();
+            JSONObject pagesObject = queryobject.getJSONObject("pages");
+            Iterator<String> iterator = pagesObject.keys();
+
+            while (iterator.hasNext()) {
+                String key = iterator.next();
+                try {
+                    JSONObject value;
+                    value = (JSONObject) pagesObject.get(key);
+                    JSONObject thumbnail = value.getJSONObject("thumbnail");
+                    String source = thumbnail.getString("source");
+                    Log.v(LOG_TAG, "thumbnail" + source);
+                    URL imgURL = new URL(source);
+                    HttpURLConnection imgConnection = (HttpURLConnection) imgURL.openConnection();
+                    InputStream inputStream = imgConnection.getInputStream();
+                    Bitmap bit = BitmapFactory.decodeStream(inputStream);
+                    resultImgs.add(bit);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            Bitmap[] resultImg = new Bitmap[resultImgs.size()];
+            resultImgs.toArray(resultImg);
+            return resultImg;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap[] bitmaps) {
+            if(imageViewReference!=null && bitmaps!=null){
+                for(Bitmap b:bitmaps) {
+                    ImageView imageview = imageViewReference.get();
+                    imageview.setImageBitmap(b);
+                }
+            }
+        }
+    }
+        public class FetchLandmark extends AsyncTask<Object, Object, String[]> {
 
         private final String LOG_TAG = FetchLandmark.class.getSimpleName();
 
@@ -219,6 +341,7 @@ public class LocFragment extends Fragment {
                     InputStream inputStream = imgConnection.getInputStream();
                     Bitmap bit = BitmapFactory.decodeStream(inputStream);
                     resultImgs.add(bit);
+
                     Log.v(LOG_TAG, "Image is" + bit);
 
                 }catch (Exception e){
@@ -231,6 +354,7 @@ public class LocFragment extends Fragment {
             return resultSet;
         }
 
+
         @Override
         protected void onPostExecute(String[] result) {
             if(result!=null){
@@ -241,4 +365,5 @@ public class LocFragment extends Fragment {
             }
         }
     }
+
 }
