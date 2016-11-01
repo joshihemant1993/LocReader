@@ -1,7 +1,6 @@
 package com.example.hrjoshi.locreader;
 
 import android.app.Fragment;
-import android.content.ClipData;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,8 +17,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -63,12 +60,18 @@ public class LocFragment extends Fragment {
         if (id == R.id.action_refresh) {
             FetchLandmark fetchLandmark = new FetchLandmark();
             fetchLandmark.execute();
-            FetchImage fetchImage = new FetchImage(imageView);
-            fetchImage.execute();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        FetchLandmark fetchLandmark = new FetchLandmark();
+        fetchLandmark.execute();
+    }
+
     List<RowItem> rowItems;
     @Nullable
     @Override
@@ -81,11 +84,11 @@ public class LocFragment extends Fragment {
         };
         List<String> landmark = new ArrayList<String>(Arrays.asList(data));
         List<Bitmap> imglist = new ArrayList<Bitmap>();
-        for(int i=0;i<landmark.size();i++){
+    /*    for(int i=0;i<landmark.size();i++){
             RowItem item = new RowItem(imglist.get(i),landmark.get(i), "Hello");
             rowItems.add(item);
         }
-
+    */
         rowItems = new ArrayList<RowItem>();
 
    /*     mLocAdapter = new ArrayAdapter<String>(
@@ -108,8 +111,7 @@ public class LocFragment extends Fragment {
         adapter = new CustomListViewAdapter(
                 getActivity(),
                 R.layout.list_item_landmark,
-                rowItems
-        );
+                new ArrayList<RowItem>());
         listView.setAdapter(adapter);
     //    imageView = (ImageView) rootView.findViewById(R.id.list_item_landmark_image);
 
@@ -118,7 +120,7 @@ public class LocFragment extends Fragment {
 
     }
 
-   public class FetchImage extends AsyncTask<String, Object, Bitmap[]> {
+ /*  public class FetchImage extends AsyncTask<String, Object, Bitmap[]> {
         private final String LOG_TAG = FetchImage.class.getSimpleName();
         //private WeakReference<ImageView> imageViewReference;
         private ImageView imageView;
@@ -135,7 +137,7 @@ public class LocFragment extends Fragment {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             String landmarkJson = null;
-            String baseUrl = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=coordinates%7Cpageimages%7Cpageterms&colimit=50&piprop=thumbnail&pithumbsize=144&pilimit=50&wbptterms=description&generator=geosearch&ggscoord=47.606209%7C-122.332071&ggsradius=10000&ggslimit=50";
+            String baseUrl = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=coordinates%7Cpageimages%7Cpageterms&colimit=50&piprop=thumbnail&pithumbsize=144&pilimit=50&wbptterms=description&generator=geosearch&ggscoord=47.606209%7C-122.332071&ggsradius=100&ggslimit=50";
             URL url = null;
             try {
                 url = new URL(baseUrl);
@@ -185,18 +187,10 @@ public class LocFragment extends Fragment {
                 }
             }
 
-            try {
-                //    Log.v(LOG_TAG, "Trying to call method");
-                return getLandmarkImage(landmarkJson);
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                e.printStackTrace();
-            }
-
             return null;
         }
 
-        private Bitmap[] getLandmarkImage(String landmarkJson) throws JSONException {
+    /*    private Bitmap[] getLandmarkImage(String landmarkJson) throws JSONException {
             JSONObject LandmarkJson = new JSONObject(landmarkJson);
 
             JSONObject queryobject = LandmarkJson.getJSONObject("query");
@@ -242,23 +236,18 @@ public class LocFragment extends Fragment {
             }
         }
     }
-
-        public class FetchLandmark extends AsyncTask<Object, Object, String[]> {
+*/
+        public class FetchLandmark extends AsyncTask<Object, Object, RowItem[]> {
 
         private final String LOG_TAG = FetchLandmark.class.getSimpleName();
 
         @Override
-        protected String[] doInBackground(Object... params) {
+        protected RowItem[] doInBackground(Object... params) {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             String landmarkJson = null;
 
-
-            String format = "json";
-            String lists = "geosearch";
-
             LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-
             Criteria criteria = new Criteria();
             String bestProvider = lm.getBestProvider(criteria, false);
             Location location;
@@ -275,14 +264,7 @@ public class LocFragment extends Fragment {
         */
             try{
 
-                //final String base = "https://en.wikipedia.org/w/api.php?action=query";
-                //final String format_param = "format";
-                //final String list_param = "list";
-
-
-            //    String baseUrl = "https://en.wikipedia.org/w/api.php?action=query&format=json&list=geosearch&gscoord=47.606209%7C-122.332071&gsradius=10000&gslimit=10";
-
-              String baseUrl = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=coordinates%7Cpageimages%7Cpageterms&colimit=50&piprop=thumbnail&pithumbsize=144&pilimit=50&wbptterms=description&generator=geosearch&ggscoord=47.606209%7C-122.332071&ggsradius=10000&ggslimit=50";
+              String baseUrl = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=coordinates%7Cpageimages%7Cpageterms&colimit=50&piprop=thumbnail&pithumbsize=144&pilimit=50&wbptterms=description&generator=geosearch&ggscoord=47.606209%7C-122.332071&ggsradius=50&ggslimit=50";
                 URL url = new URL(baseUrl);
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -307,7 +289,7 @@ public class LocFragment extends Fragment {
                 }
                 landmarkJson = buffer.toString();
 
-                Log.v(LOG_TAG,"Landmark String: "+landmarkJson);
+             //   Log.v(LOG_TAG,"Landmark String: "+landmarkJson);
 
             } catch (IOException e) {
                 Log.e(LOG_TAG,"Error ",e);
@@ -339,14 +321,13 @@ public class LocFragment extends Fragment {
         return null;
         }
 
-        private String[] getLandmarkData(String landmarkJson) throws JSONException{
+        private RowItem[] getLandmarkData(String landmarkJson) throws JSONException{
 
             JSONObject LandmarkJson = new JSONObject(landmarkJson);
 
             //JSONObject batchcomplete = LandmarkJson.getJSONObject("batchcomplete");
             JSONObject queryobject = LandmarkJson.getJSONObject("query");
 
-            //String[] resultStrs = new String[queryobject.length()];
             ArrayList<String> resultStrs = new ArrayList<String>();
             ArrayList<Bitmap> resultImgs = new ArrayList<Bitmap>();
             JSONObject pagesObject = queryobject.getJSONObject("pages");
@@ -360,36 +341,48 @@ public class LocFragment extends Fragment {
                     String title = value.getString("title");
 
                     Log.v(LOG_TAG, "Title is " +title);
-                //    map.put(key,value);
                     resultStrs.add(title);
-        /*            JSONObject thumbnail = value.getJSONObject("thumbnail");
-                    String source = thumbnail.getString("source");
-                    Log.v(LOG_TAG,"thumbnail" + source);
-                   URL imgURL = new URL(source);
-                    HttpURLConnection imgConnection = (HttpURLConnection) imgURL.openConnection();
-                    InputStream inputStream = imgConnection.getInputStream();
-                    Bitmap bit = BitmapFactory.decodeStream(inputStream);
-                    resultImgs.add(bit);
+                    if(value.has("thumbnail")) {
+                        Log.v(LOG_TAG, "Entering thumbnail ");
+                        JSONObject thumbnail = value.getJSONObject("thumbnail");
+                            String source = thumbnail.getString("source");
+                            //Log.v(LOG_TAG, "thumbnail" + source);
+                            URL imgURL = new URL(source);
+                            HttpURLConnection imgConnection = (HttpURLConnection) imgURL.openConnection();
 
-                    inputStream.close();
-                    Log.v(LOG_TAG, "Image is" + bit);
-        */
+                            InputStream inputStream = imgConnection.getInputStream();
+                            Bitmap bit = BitmapFactory.decodeStream(inputStream);
+                            resultImgs.add(bit);
+                            inputStream.close();
+                            //Log.v(LOG_TAG, "Image is" + bit);
+                    }else{
+                        Log.v(LOG_TAG, "No thumbnail ");
+                        Bitmap bit = BitmapFactory.decodeResource(getResources(), R.drawable.image_unavailable);
+                        Log.v(LOG_TAG, "Bitmap is " +bit);
+                        resultImgs.add(bit);
+                    }
+
                 }catch (Exception e){
                     e.printStackTrace();
                 }
             }
+            RowItem[] resultSet= new RowItem[resultStrs.size()];
 
-            String[] resultSet = new String[resultStrs.size()];
-            resultStrs.toArray(resultSet);
+            for(int i=0;i<resultStrs.size();i++){
+                if(resultImgs.get(i)!=null) {
+                    resultSet[i].setImage(resultImgs.get(i));
+                }
+                resultSet[i].setTitle(resultStrs.get(i));
+            }
             return resultSet;
         }
 
 
         @Override
-        protected void onPostExecute(String[] result) {
+        protected void onPostExecute(RowItem[] result) {
             if(result!=null){
                 adapter.clear();
-                for(String listlandmark: result){
+                for(RowItem listlandmark: result){
                     adapter.add(listlandmark);
                 }
             }

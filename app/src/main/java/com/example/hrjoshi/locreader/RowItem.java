@@ -20,7 +20,7 @@ public class RowItem {
         public Bitmap getImage() {
             return image;
         }
-        public void setImageId(Bitmap imageId) {
+        public void setImage(Bitmap imageId) {
             this.image = image;
         }
       /*  public String getDesc() {

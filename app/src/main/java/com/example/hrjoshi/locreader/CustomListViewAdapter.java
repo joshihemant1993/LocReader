@@ -43,8 +43,8 @@ public class CustomListViewAdapter extends ArrayAdapter<RowItem> {
             }else{
                 holder = (viewHolder)convertView.getTag();
             }
-            holder.txtDesc.setText(rowItem.getDesc());
-            holder.imageView.setImageResource(rowItem.getImageId());
+            //holder.txtDesc.setText(rowItem.getDesc());
+            holder.imageView.setImageBitmap(rowItem.getImage());
 
             return convertView;
         }
