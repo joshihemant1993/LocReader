@@ -1,6 +1,7 @@
 package com.example.hrjoshi.locreader;
 
 import android.app.Fragment;
+import android.content.ClipData;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -28,7 +30,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -40,7 +41,8 @@ public class LocFragment extends Fragment {
     public LocFragment() {
     }
 
-    private ArrayAdapter<String> mLocAdapter;
+    //private ArrayAdapter<String> mLocAdapter;
+    private CustomListViewAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,18 +55,21 @@ public class LocFragment extends Fragment {
         inflater.inflate(R.menu.loc_fragment, menu);
     }
 
+    ImageView imageView;
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        ImageView img = R.id.
+
         if (id == R.id.action_refresh) {
             FetchLandmark fetchLandmark = new FetchLandmark();
             fetchLandmark.execute();
+            FetchImage fetchImage = new FetchImage(imageView);
+            fetchImage.execute();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
-
+    List<RowItem> rowItems;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -75,31 +80,54 @@ public class LocFragment extends Fragment {
                 "Your home!!!"
         };
         List<String> landmark = new ArrayList<String>(Arrays.asList(data));
+        List<Bitmap> imglist = new ArrayList<Bitmap>();
+        for(int i=0;i<landmark.size();i++){
+            RowItem item = new RowItem(imglist.get(i),landmark.get(i), "Hello");
+            rowItems.add(item);
+        }
 
-        mLocAdapter = new ArrayAdapter<String>(
+        rowItems = new ArrayList<RowItem>();
+
+   /*     mLocAdapter = new ArrayAdapter<String>(
                 getActivity(),
                 R.layout.list_item_landmark,
                 R.id.list_item_landmark_text,
                 landmark
         );
-
+        mImgAdapter = new ArrayAdapter<Bitmap>(
+                getActivity(),
+                R.layout.list_item_landmark,
+                R.id.list_item_landmark_image,
+                thumbnail
+        );
+    */
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+        //    FetchImage fetchImage = new FetchImage(imageView);
         ListView listView = (ListView) rootView.findViewById(R.id.listview_landmark);
-        listView.setAdapter(mLocAdapter);
+        adapter = new CustomListViewAdapter(
+                getActivity(),
+                R.layout.list_item_landmark,
+                rowItems
+        );
+        listView.setAdapter(adapter);
+    //    imageView = (ImageView) rootView.findViewById(R.id.list_item_landmark_image);
+
 
         return rootView;
 
     }
 
-    public class FetchImage extends AsyncTask<String, Object, Bitmap[]> {
+   public class FetchImage extends AsyncTask<String, Object, Bitmap[]> {
         private final String LOG_TAG = FetchImage.class.getSimpleName();
-        private final WeakReference<ImageView> imageViewReference;
+        //private WeakReference<ImageView> imageViewReference;
+        private ImageView imageView;
         private int data = 0;
 
         public FetchImage(ImageView imageView) {
             // Use a WeakReference to ensure the ImageView can be garbage collected
-            imageViewReference = new WeakReference<ImageView>(imageView);
+            //imageViewReference = new WeakReference<ImageView>(imageView);
+            this.imageView = imageView;
         }
 
         @Override
@@ -184,7 +212,7 @@ public class LocFragment extends Fragment {
                     value = (JSONObject) pagesObject.get(key);
                     JSONObject thumbnail = value.getJSONObject("thumbnail");
                     String source = thumbnail.getString("source");
-                    Log.v(LOG_TAG, "thumbnail" + source);
+                    Log.v(LOG_TAG, "thumbnail " + source);
                     URL imgURL = new URL(source);
                     HttpURLConnection imgConnection = (HttpURLConnection) imgURL.openConnection();
                     InputStream inputStream = imgConnection.getInputStream();
@@ -198,19 +226,23 @@ public class LocFragment extends Fragment {
 
             Bitmap[] resultImg = new Bitmap[resultImgs.size()];
             resultImgs.toArray(resultImg);
+            Log.v(LOG_TAG, "String " +resultImgs);
             return resultImg;
         }
 
-        @Override
+
+       @Override
         protected void onPostExecute(Bitmap[] bitmaps) {
-            if(imageViewReference!=null && bitmaps!=null){
+            //imageViewReference = new WeakReference<ImageView>(imageView);
+            if(imageView!=null && bitmaps!=null){
                 for(Bitmap b:bitmaps) {
-                    ImageView imageview = imageViewReference.get();
-                    imageview.setImageBitmap(b);
+                    Log.v(LOG_TAG,"Printing Image");
+                    imageView.setImageBitmap(b);
                 }
             }
         }
     }
+
         public class FetchLandmark extends AsyncTask<Object, Object, String[]> {
 
         private final String LOG_TAG = FetchLandmark.class.getSimpleName();
@@ -266,9 +298,6 @@ public class LocFragment extends Fragment {
 
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                    // But it does make debugging a *lot* easier if you print out the completed
-                    // buffer for debugging.
                     buffer.append(line + "\n");
                 }
 
@@ -333,7 +362,7 @@ public class LocFragment extends Fragment {
                     Log.v(LOG_TAG, "Title is " +title);
                 //    map.put(key,value);
                     resultStrs.add(title);
-                    JSONObject thumbnail = value.getJSONObject("thumbnail");
+        /*            JSONObject thumbnail = value.getJSONObject("thumbnail");
                     String source = thumbnail.getString("source");
                     Log.v(LOG_TAG,"thumbnail" + source);
                    URL imgURL = new URL(source);
@@ -342,8 +371,9 @@ public class LocFragment extends Fragment {
                     Bitmap bit = BitmapFactory.decodeStream(inputStream);
                     resultImgs.add(bit);
 
+                    inputStream.close();
                     Log.v(LOG_TAG, "Image is" + bit);
-
+        */
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -358,9 +388,9 @@ public class LocFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] result) {
             if(result!=null){
-                mLocAdapter.clear();
+                adapter.clear();
                 for(String listlandmark: result){
-                    mLocAdapter.add(listlandmark);
+                    adapter.add(listlandmark);
                 }
             }
         }
