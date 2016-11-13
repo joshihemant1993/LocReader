@@ -2,6 +2,7 @@ package com.example.hrjoshi.locreader;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Criteria;
@@ -68,6 +69,10 @@ public class LocFragment extends Fragment {
         }
         if (id == R.id.action_map) {
             Log.v(TAG, "Map item about to be called");
+            Intent intent = new Intent(getActivity(),MapsLocation.class);
+            intent.putExtra("title","Location");
+            startActivity(intent);
+
         }
         return super.onOptionsItemSelected(item);
     }
