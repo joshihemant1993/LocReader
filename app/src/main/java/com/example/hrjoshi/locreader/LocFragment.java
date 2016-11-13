@@ -37,6 +37,8 @@ import java.util.Iterator;
 import java.util.List;
 
 public class LocFragment extends Fragment {
+    private final String TAG = LocFragment.class.getSimpleName();
+
     public LocFragment() {
     }
 
@@ -64,8 +66,12 @@ public class LocFragment extends Fragment {
             fetchLandmark.execute();
             return true;
         }
+        if (id == R.id.action_map) {
+            Log.v(TAG, "Map item about to be called");
+        }
         return super.onOptionsItemSelected(item);
     }
+
 
     @Override
     public void onStart() {
@@ -111,7 +117,6 @@ public class LocFragment extends Fragment {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             String landmarkJson = null;
-
             LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
             Criteria criteria = new Criteria();
             String bestProvider = lm.getBestProvider(criteria, false);
@@ -185,7 +190,6 @@ public class LocFragment extends Fragment {
             }
             return null;
         }
-
         private ArrayList<RowItem> getLandmarkData(String landmarkJson) throws JSONException {
 
             JSONObject LandmarkJson = new JSONObject(landmarkJson);

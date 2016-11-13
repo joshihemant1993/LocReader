@@ -20,4 +20,5 @@
         android:gravity="center_vertical"
         android:id="@+id/list_item_landmark_text" />
 
+
 </RelativeLayout>
