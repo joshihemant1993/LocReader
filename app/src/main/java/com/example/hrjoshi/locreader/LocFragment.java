@@ -128,8 +128,6 @@ public class LocFragment extends Fragment {
             Location location;
 
         /*    location = lm.getLastKnownLocation(bestProvider);
-
-
             if (location == null){
                 Toast.makeText(getActivity(),"Location Not found",Toast.LENGTH_LONG).show();
             }
@@ -138,13 +136,11 @@ public class LocFragment extends Fragment {
             Log.v(LOG_TAG,"Location" + latitude + longitude);
         */
             try {
-
                 String baseUrl = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=coordinates%7Cpageimages%7Cpageterms&colimit=50&piprop=thumbnail&pithumbsize=144&pilimit=50&wbptterms=description&generator=geosearch&ggscoord=47.606209%7C-122.332071&ggsradius=1000&ggslimit=50";
                 URL url = new URL(baseUrl);
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.connect();
-
                 InputStream inputStream = urlConnection.getInputStream();
                 StringBuffer buffer = new StringBuffer();
                 if (inputStream == null) {
@@ -157,15 +153,12 @@ public class LocFragment extends Fragment {
                 while ((line = reader.readLine()) != null) {
                     buffer.append(line + "\n");
                 }
-
                 if (buffer.length() == 0) {
                     // Stream was empty.  No point in parsing.
                     return null;
                 }
                 landmarkJson = buffer.toString();
-
                 //   Log.v(LOG_TAG,"Landmark String: "+landmarkJson);
-
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
                 e.printStackTrace();
@@ -185,7 +178,6 @@ public class LocFragment extends Fragment {
                     Log.e(LOG_TAG, "Error Closing Stream", e);
                 }
             }
-
             try {
                 //    Log.v(LOG_TAG, "Trying to call method");
                 return getLandmarkData(landmarkJson);
@@ -196,16 +188,13 @@ public class LocFragment extends Fragment {
             return null;
         }
         private ArrayList<RowItem> getLandmarkData(String landmarkJson) throws JSONException {
-
             JSONObject LandmarkJson = new JSONObject(landmarkJson);
             JSONObject queryobject = LandmarkJson.getJSONObject("query");
-
             ArrayList<RowItem> resultRow = new ArrayList<RowItem>();
             ArrayList<String> resultStrs = new ArrayList<String>();
             ArrayList<Bitmap> resultImgs = new ArrayList<Bitmap>();
             JSONObject pagesObject = queryobject.getJSONObject("pages");
             Iterator<String> iterator = pagesObject.keys();
-
             while (iterator.hasNext()) {
                 String key = iterator.next();
                 String title;
@@ -214,20 +203,16 @@ public class LocFragment extends Fragment {
                     JSONObject value;
                     value = (JSONObject) pagesObject.get(key);
                     title = value.getString("title");
-
                     Log.v(LOG_TAG, "Title is " + title);
                     if (value.has("thumbnail")) {
                         Log.v(LOG_TAG, "Entering thumbnail ");
                         JSONObject thumbnail = value.getJSONObject("thumbnail");
                         String source = thumbnail.getString("source");
-                        //Log.v(LOG_TAG, "thumbnail" + source);
                         URL imgURL = new URL(source);
                         HttpURLConnection imgConnection = (HttpURLConnection) imgURL.openConnection();
-
                         InputStream inputStream = imgConnection.getInputStream();
                         bit = BitmapFactory.decodeStream(inputStream);
                         inputStream.close();
-                        //Log.v(LOG_TAG, "Image is" + bit);
                         Log.v(LOG_TAG, "Bitmap is " + bit);
                     } else {
                         Log.v(LOG_TAG, "No thumbnail ");
