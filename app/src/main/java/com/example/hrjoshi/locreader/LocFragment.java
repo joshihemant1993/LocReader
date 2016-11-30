@@ -1,6 +1,7 @@
 package com.example.hrjoshi.locreader;
 
 import android.app.Fragment;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,8 +12,10 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -36,6 +39,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+
+import static com.example.hrjoshi.locreader.MainActivity.notifyID;
 
 public class LocFragment extends Fragment {
     private final String TAG = LocFragment.class.getSimpleName();
@@ -112,6 +117,7 @@ public class LocFragment extends Fragment {
         return rootView;
 
     }
+    RowItem item = null;
 
     public class FetchLandmark extends AsyncTask<Object, Object, ArrayList<RowItem>> {
 
@@ -219,7 +225,7 @@ public class LocFragment extends Fragment {
                         bit = BitmapFactory.decodeResource(getResources(), R.drawable.image_unavailable);
                         Log.v(LOG_TAG, "Bitmap is " + bit);
                     }
-                    RowItem item = new RowItem(bit, title);
+                    item = new RowItem(bit, title);
                     resultRow.add(item);
 
                 } catch (Exception e) {
@@ -228,7 +234,6 @@ public class LocFragment extends Fragment {
             }
             return (ArrayList<RowItem>) resultRow;
         }
-
         @Override
         protected void onPostExecute(ArrayList<RowItem> result) {
             adapter.clear();
@@ -236,7 +241,25 @@ public class LocFragment extends Fragment {
                 Log.v(LOG_TAG, "End string is " + landmark.getTitle());
                 adapter.add(landmark);
                 Log.v(LOG_TAG, "end of loop");
+                sendNotif();
+
             }
+            sendNotif();
         }
+    }
+    //PendingIntent pi = PendingIntent.getActivity(getContext(), 0, new Intent(getContext(), MapsLocation.class), PendingIntent.FLAG_UPDATE_CURRENT);
+    public void sendNotif() {
+        NotificationCompat.Builder mnotif = new NotificationCompat.Builder(getContext())
+                .setSmallIcon(R.drawable.icon)
+                .setContentTitle("Nearest location")
+                //.setContentIntent(pi)
+                .setContentText(item.getTitle());
+
+        mnotif.setPriority(NotificationCompat.PRIORITY_HIGH);
+        mnotif.setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
+
+        //int notifyID = 001;
+        NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(notifyID, mnotif.build());
     }
 }

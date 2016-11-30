@@ -1,14 +1,25 @@
 package com.example.hrjoshi.locreader;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import static com.example.hrjoshi.locreader.R.layout.activity_main;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static int notifyID = 001;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,6 +30,33 @@ public class MainActivity extends AppCompatActivity {
                     .commit();
         }
 
+    }
+    private int notifyCount = 0;
+    public void sendNotification(View v){
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean showPopUp = prefs.getBoolean("pref_show_notification",true);
+
+        if(showPopUp) {
+            PendingIntent pi = PendingIntent.getActivity(this, 0, new Intent(this, MapsLocation.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+                    .setSmallIcon(R.drawable.icon)
+                    .setContentTitle("Location Reader")
+                    .setContentIntent(pi)
+                    .setContentText("Want to see this in a map?");
+
+            mBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
+            mBuilder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
+
+            int notifyID = 001;
+            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.notify(notifyID, mBuilder.build());
+            Toast.makeText(this, "The Location Reader app", Toast.LENGTH_LONG).show();
+
+        }else{
+            Toast.makeText(this, "The Location Reader app", Toast.LENGTH_LONG).show();
+        }
     }
 
 
