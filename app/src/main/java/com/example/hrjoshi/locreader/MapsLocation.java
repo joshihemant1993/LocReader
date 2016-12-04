@@ -16,6 +16,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -78,15 +80,6 @@ public class MapsLocation extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -98,6 +91,18 @@ public class MapsLocation extends FragmentActivity implements OnMapReadyCallback
                     .title("Your current location"));
             Log.v(TAG, "LatLong is " + latLng);
         }
+        double xLat = 47.606209;
+        //double xLong = location.getLongitude();
+        double xLong= -122.332071;
+        latLng = new LatLng(xLat,xLong);
+        mMap.addMarker(new MarkerOptions()
+                .position(latLng)
+                .title("Your current location"));
+
+        CameraUpdate center = CameraUpdateFactory.newLatLng(latLng);
+        CameraUpdate zoom = CameraUpdateFactory.zoomTo(10);
+        googleMap.moveCamera(center);
+        googleMap.animateCamera(zoom);
     }
 
     @Override
