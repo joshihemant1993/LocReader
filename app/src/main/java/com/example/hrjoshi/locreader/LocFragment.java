@@ -24,6 +24,9 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,7 +42,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class LocFragment extends Fragment {
-    public static ArrayList<RowItem> results = new ArrayList<RowItem>();
+    public static ArrayList<LatLng> Locationresults = new ArrayList<LatLng>();
     private final String TAG = LocFragment.class.getSimpleName();
 
     public LocFragment() {
@@ -141,14 +144,6 @@ public class LocFragment extends Fragment {
             String bestProvider = lm.getBestProvider(criteria, false);
             Location location;
 
-        /*    location = lm.getLastKnownLocation(bestProvider);
-            if (location == null){
-                Toast.makeText(getActivity(),"Location Not found",Toast.LENGTH_LONG).show();
-            }
-            double longitude = location.getLongitude();
-            double latitude = location.getLatitude();
-            Log.v(LOG_TAG,"Location" + latitude + longitude);
-        */
             try {
                 String baseUrl = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=coordinates%7Cpageimages%7Cpageterms&colimit=50&piprop=thumbnail&pithumbsize=144&pilimit=50&wbptterms=description&generator=geosearch&ggscoord=47.606209%7C-122.332071&ggsradius=1000&ggslimit=50";
                 URL url = new URL(baseUrl);
@@ -193,7 +188,6 @@ public class LocFragment extends Fragment {
                 }
             }
             try {
-                //    Log.v(LOG_TAG, "Trying to call method");
                 return getLandmarkData(landmarkJson);
             } catch (JSONException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
@@ -204,6 +198,7 @@ public class LocFragment extends Fragment {
         private ArrayList<RowItem> getLandmarkData(String landmarkJson) throws JSONException {
             JSONObject LandmarkJson = new JSONObject(landmarkJson);
             JSONObject queryobject = LandmarkJson.getJSONObject("query");
+            ArrayList<LatLng> getLocations = new ArrayList<>();
             ArrayList<RowItem> resultRow = new ArrayList<RowItem>();
             ArrayList<String> resultStrs = new ArrayList<String>();
             ArrayList<Bitmap> resultImgs = new ArrayList<Bitmap>();
@@ -213,6 +208,8 @@ public class LocFragment extends Fragment {
                 String key = iterator.next();
                 String title;
                 Bitmap bit;
+                double Lat;
+                double Long;
                 try {
                     JSONObject value;
                     value = (JSONObject) pagesObject.get(key);
@@ -235,6 +232,15 @@ public class LocFragment extends Fragment {
                     }
                     item = new RowItem(bit, title);
                     resultRow.add(item);
+                    if(value.has("coordinates")){
+                        Log.v(LOG_TAG,"fetching latlongs");
+                        JSONArray coordinates = value.getJSONArray("coordinates");
+                        JSONObject coordinate = (JSONObject) coordinates.get(0);
+                        Lat=coordinate.getDouble("lat");
+                        Long=coordinate.getDouble("lon");
+                        Log.v(LOG_TAG,"Lat is "+Lat);
+                        Locationresults.add(new LatLng(Lat,Long));
+                    }
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -245,11 +251,10 @@ public class LocFragment extends Fragment {
         @Override
         protected void onPostExecute(ArrayList<RowItem> result) {
             adapter.clear();
-            results = result;
             for (RowItem landmark : result) {
-                Log.v(LOG_TAG, "End string is " + landmark.getTitle());
+            //    Log.v(LOG_TAG, "End string is " + landmark.getTitle());
                 adapter.add(landmark);
-                Log.v(LOG_TAG, "end of loop");
+            //    Log.v(LOG_TAG, "end of loop");
         //        sendNotif();
 
             }

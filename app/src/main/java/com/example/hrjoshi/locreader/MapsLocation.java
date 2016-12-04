@@ -24,7 +24,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import static com.example.hrjoshi.locreader.LocFragment.results;
+import static com.example.hrjoshi.locreader.LocFragment.Locationresults;
 
 public class MapsLocation extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -65,7 +65,7 @@ public class MapsLocation extends FragmentActivity implements OnMapReadyCallback
         mLocationRequest.setInterval(UPDATE_INTERVAL);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-        if(results!=null){
+        if(Locationresults!=null){
             Log.v(TAG,"Location list is not null");
         }
     }
