@@ -26,7 +26,7 @@ public class MapsLocation extends FragmentActivity implements OnMapReadyCallback
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
-
+    public static Location location;
     private GoogleMap mMap;
     private String TAG = "Location on Map";
     private static int READ_LOCATION_PERMISSION = 1;
@@ -90,11 +90,14 @@ public class MapsLocation extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        // Add a marker in Sydney and move the camera
-        //LatLng sydney = new LatLng(-34, 151);
-        //mMap.addMarker(new MarkerOptions().position(latLng).title("Marker in Sydney"));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        Log.v(TAG,"LatLong is "+latLng);
+        Log.v(TAG,"Entering map!");
+        if (location!=null){
+            LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+            mMap.addMarker(new MarkerOptions()
+                    .position(currentLatLng)
+                    .title("Your current location"));
+            Log.v(TAG, "LatLong is " + latLng);
+        }
     }
 
     @Override
@@ -106,12 +109,12 @@ public class MapsLocation extends FragmentActivity implements OnMapReadyCallback
             }
             requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, READ_LOCATION_PERMISSION);
         }
-        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if(location == null){
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,mLocationRequest,this);
-            Log.i(TAG,"Location is "+location);
+            Log.v(TAG,"Location is "+location);
         }else{
-            Log.i(TAG,"Location abc is "+location);
+            Log.v(TAG,"Location abc is "+location);
             handleNewLocation(location);
         }
     }
@@ -119,10 +122,15 @@ public class MapsLocation extends FragmentActivity implements OnMapReadyCallback
     public void handleNewLocation(Location location){
         //Log.i(TAG,location.toString());
         double currentLat = location.getLatitude();
+        currentLat = 47.606209;
         double currentLong = location.getLongitude();
+        currentLong = -122.332071;
         latLng = new LatLng(currentLat,currentLong);
         Log.v(TAG,"Your current location is " + latLng.toString());
         MarkerOptions options=new MarkerOptions().position(latLng).title("You are here");
+        mMap.addMarker(new MarkerOptions()
+                .position(latLng)
+                .title("Your current location"));
     }
 
     @Override
