@@ -39,6 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class LocFragment extends Fragment {
+    public static ArrayList<RowItem> results = new ArrayList<RowItem>();
     private final String TAG = LocFragment.class.getSimpleName();
 
     public LocFragment() {
@@ -58,6 +59,7 @@ public class LocFragment extends Fragment {
     }
 
     ImageView imageView;
+    public Intent Mapintent;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -70,9 +72,10 @@ public class LocFragment extends Fragment {
         }
         if (id == R.id.action_map) {
             Log.v(TAG, "Map item about to be called");
-            Intent intent = new Intent(getActivity(),MapsLocation.class);
-            intent.putExtra("title","Location");
-            startActivity(intent);
+            Mapintent = new Intent(getActivity(),MapsLocation.class);
+            Mapintent.putExtra("title","Location");
+
+            startActivity(Mapintent);
 
         }
         return super.onOptionsItemSelected(item);
@@ -242,6 +245,7 @@ public class LocFragment extends Fragment {
         @Override
         protected void onPostExecute(ArrayList<RowItem> result) {
             adapter.clear();
+            results = result;
             for (RowItem landmark : result) {
                 Log.v(LOG_TAG, "End string is " + landmark.getTitle());
                 adapter.add(landmark);
