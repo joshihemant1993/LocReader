@@ -141,6 +141,18 @@ public class LocFragment extends Fragment {
         private final String LOG_TAG = FetchLandmark.class.getSimpleName();
 
         @Override
+        protected void onPreExecute() {
+            if(location==null){
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            super.onPreExecute();
+        }
+
+        @Override
         protected ArrayList<RowItem> doInBackground(Object... params) {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;

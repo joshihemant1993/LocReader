@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public static int notifyID = 001;
     public static Location location;
-    private String LOG_TAG = "Main Activity";
+    String LOG_TAG = "Main Activity";
     private static int READ_LOCATION_PERMISSION = 1;
     GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest;
