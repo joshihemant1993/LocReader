@@ -110,7 +110,8 @@ public class MainActivity extends AppCompatActivity implements
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,mLocationRequest,this);
             Log.v(LOG_TAG,"Location is "+location);
         }else{
-            Log.v(LOG_TAG,"Current Location is "+location);
+
+            Log.v(LOG_TAG,"Current latitude is "+location.getLatitude());
         }
     }
 

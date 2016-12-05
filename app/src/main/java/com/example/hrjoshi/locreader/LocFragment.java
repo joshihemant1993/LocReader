@@ -81,7 +81,7 @@ public class LocFragment extends Fragment {
         }
         if (id == R.id.action_map) {
             Log.v(TAG, "Map item about to be called");
-            Mapintent = new Intent(getActivity(),MapsLocation.class);
+            Mapintent = new Intent(getActivity(),MapsActivity.class);
             Mapintent.putExtra("title","Location");
 
             startActivity(Mapintent);
