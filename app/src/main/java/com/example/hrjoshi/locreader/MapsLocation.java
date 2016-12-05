@@ -1,41 +1,36 @@
 package com.example.hrjoshi.locreader;
 
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Iterator;
 
 import static com.example.hrjoshi.locreader.LocFragment.Locationresults;
+import static com.example.hrjoshi.locreader.MainActivity.location;
 
-public class MapsLocation extends FragmentActivity implements OnMapReadyCallback,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
-    public static Location location;
+public class MapsLocation extends FragmentActivity implements OnMapReadyCallback
+       // GoogleApiClient.ConnectionCallbacks,
+       // GoogleApiClient.OnConnectionFailedListener,
+       // LocationListener
+       {
+    //public static Location location;
     private GoogleMap mMap;
     private String TAG = "Location on Map";
+    public LatLng latLng;
     private static int READ_LOCATION_PERMISSION = 1;
     GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest;
@@ -50,6 +45,7 @@ public class MapsLocation extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+    /*
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (shouldShowRequestPermissionRationale(android.Manifest.permission.ACCESS_FINE_LOCATION)) {
                 Toast.makeText(this, "Oops! We need permission to get access to the location :(", Toast.LENGTH_SHORT).show();
@@ -70,10 +66,8 @@ public class MapsLocation extends FragmentActivity implements OnMapReadyCallback
 
         if(Locationresults!=null){
             Log.v(TAG,"Location list is not null");
-
+    */
         }
-
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -106,7 +100,7 @@ public class MapsLocation extends FragmentActivity implements OnMapReadyCallback
         double xLat = 47.606209;
         //double xLong = location.getLongitude();
         double xLong= -122.332071;
-        latLng = new LatLng(xLat,xLong);
+        latLng = new LatLng(location.getLatitude(),location.getLongitude());
         mMap.addMarker(new MarkerOptions()
                 .position(latLng)
                 .title("Your current location"));
@@ -124,7 +118,7 @@ public class MapsLocation extends FragmentActivity implements OnMapReadyCallback
         googleMap.animateCamera(zoom);
     }
 
-    @Override
+  /*  @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.v(TAG, "Location Services Connected");
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -142,7 +136,7 @@ public class MapsLocation extends FragmentActivity implements OnMapReadyCallback
             handleNewLocation(location);
         }
     }
-    public LatLng latLng;
+
     public void handleNewLocation(Location location){
         //Log.i(TAG,location.toString());
         double currentLat = location.getLatitude();
@@ -168,5 +162,5 @@ public class MapsLocation extends FragmentActivity implements OnMapReadyCallback
     public void onLocationChanged(Location location) {
         Log.i(TAG,"Location changed to " + location.toString());
         handleNewLocation(location);
-    }
+    }*/
 }

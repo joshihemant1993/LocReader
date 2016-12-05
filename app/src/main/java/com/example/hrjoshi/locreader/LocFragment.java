@@ -1,6 +1,7 @@
 package com.example.hrjoshi.locreader;
 
 import android.app.Fragment;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,8 +12,10 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,9 +44,12 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.example.hrjoshi.locreader.MainActivity.notifyID;
+
 public class LocFragment extends Fragment {
     public static ArrayList<LatLng> Locationresults = new ArrayList<LatLng>();
     private final String TAG = LocFragment.class.getSimpleName();
+
 
     public LocFragment() {
     }
@@ -54,7 +60,7 @@ public class LocFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-    }
+            }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -255,14 +261,12 @@ public class LocFragment extends Fragment {
             //    Log.v(LOG_TAG, "End string is " + landmark.getTitle());
                 adapter.add(landmark);
             //    Log.v(LOG_TAG, "end of loop");
-        //        sendNotif();
-
             }
-        //          sendNotif();
+                  sendNotif();
         }
     }
     //PendingIntent pi = PendingIntent.getActivity(getContext(), 0, new Intent(getContext(), MapsLocation.class), PendingIntent.FLAG_UPDATE_CURRENT);
-    /*public void sendNotif() {
+    public void sendNotif() {
         NotificationCompat.Builder mnotif = new NotificationCompat.Builder(getContext())
                 .setSmallIcon(R.drawable.icon)
                 .setContentTitle("Nearest location")
@@ -276,5 +280,5 @@ public class LocFragment extends Fragment {
         NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(notifyID, mnotif.build());
     }
-*/
+
 }
