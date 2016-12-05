@@ -49,7 +49,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .title("Your current location"));
             //Log.v(TAG, "Printing location " + location.toString());
             CameraUpdate center = CameraUpdateFactory.newLatLng(currentLatLng);
-            CameraUpdate zoom = CameraUpdateFactory.zoomTo(16);
+            CameraUpdate zoom = CameraUpdateFactory.zoomTo(12);
             googleMap.moveCamera(center);
             googleMap.animateCamera(zoom);
 

@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Criteria;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -44,6 +43,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.example.hrjoshi.locreader.MainActivity.location;
 import static com.example.hrjoshi.locreader.MainActivity.notifyID;
 
 public class LocFragment extends Fragment {
@@ -94,8 +94,8 @@ public class LocFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        FetchLandmark fetchLandmark = new FetchLandmark();
-        fetchLandmark.execute();
+            FetchLandmark fetchLandmark = new FetchLandmark();
+            fetchLandmark.execute();
     }
 
     List<RowItem> rowItems;
@@ -148,10 +148,33 @@ public class LocFragment extends Fragment {
             LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
             Criteria criteria = new Criteria();
             String bestProvider = lm.getBestProvider(criteria, false);
-            Location location;
+            if(location==null){
 
+            }
+/*
+            final String WIKI_BASE = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=coordinates%7Cpageimages%7Cpageterms&colimit=50&piprop=thumbnail&pithumbsize=144&pilimit=50&wbptterms=description&generator=geosearch";
+            //ggscoord=47.606209%7C-122.332071&ggsradius=1000&ggslimit=50
+            final String LOCATION_BASE = "ggscoord";
+            String LATLONG_VALUE = "47.606209%7C-122.332071";
+            if(location!=null) {
+                LATLONG_VALUE = location.getLatitude() + "%7C" + location.getLongitude();
+            }
+            final String RADIUS_BASE = "ggsradius";
+            int RADIUS_VALUE = 1000;
+            final String LIMIT_BASE = "ggslimit";
+            int LIMIT_VALUE = 50;
+*/
             try {
-                String baseUrl = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=coordinates%7Cpageimages%7Cpageterms&colimit=50&piprop=thumbnail&pithumbsize=144&pilimit=50&wbptterms=description&generator=geosearch&ggscoord=47.606209%7C-122.332071&ggsradius=1000&ggslimit=50";
+  /*              Uri builtUri = Uri.parse(WIKI_BASE).buildUpon()
+                        .appendQueryParameter(LOCATION_BASE,LATLONG_VALUE)
+                        .appendQueryParameter(RADIUS_BASE,Integer.toString(RADIUS_VALUE))
+                        .appendQueryParameter(LIMIT_BASE,Integer.toString(LIMIT_VALUE))
+                        .build();
+            URL url = new URL(builtUri.toString());
+
+                Log.v(TAG,url.toString());
+    */
+                String baseUrl = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=coordinates%7Cpageimages%7Cpageterms&colimit=50&piprop=thumbnail&pithumbsize=144&pilimit=50&wbptterms=description&generator=geosearch&ggscoord=47.6550%7C-122.3080&ggsradius=1000&ggslimit=20";
                 URL url = new URL(baseUrl);
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -265,7 +288,7 @@ public class LocFragment extends Fragment {
                   sendNotif();
         }
     }
-    //PendingIntent pi = PendingIntent.getActivity(getContext(), 0, new Intent(getContext(), MapsLocation.class), PendingIntent.FLAG_UPDATE_CURRENT);
+    //PendingIntent pi = PendingIntent.getActivity(getContext(), 0, new Intent(getContext(), MapsActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
     public void sendNotif() {
         NotificationCompat.Builder mnotif = new NotificationCompat.Builder(getContext())
                 .setSmallIcon(R.drawable.icon)
