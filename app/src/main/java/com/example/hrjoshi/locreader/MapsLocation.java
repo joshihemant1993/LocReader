@@ -21,8 +21,11 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.Iterator;
 
 import static com.example.hrjoshi.locreader.LocFragment.Locationresults;
 
@@ -67,7 +70,9 @@ public class MapsLocation extends FragmentActivity implements OnMapReadyCallback
 
         if(Locationresults!=null){
             Log.v(TAG,"Location list is not null");
+
         }
+
     }
 
     @Override
@@ -105,9 +110,16 @@ public class MapsLocation extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions()
                 .position(latLng)
                 .title("Your current location"));
+        Iterator<LatLng> locationIterator = Locationresults.iterator();
+        while (locationIterator.hasNext()){
+            Log.v(TAG,locationIterator.next().toString());
+            mMap.addMarker((new MarkerOptions()
+                .position(locationIterator.next())
+                .title("This is a new location")));
+        }
 
         CameraUpdate center = CameraUpdateFactory.newLatLng(latLng);
-        CameraUpdate zoom = CameraUpdateFactory.zoomTo(10);
+        CameraUpdate zoom = CameraUpdateFactory.zoomTo(16);
         googleMap.moveCamera(center);
         googleMap.animateCamera(zoom);
     }
@@ -142,19 +154,16 @@ public class MapsLocation extends FragmentActivity implements OnMapReadyCallback
         MarkerOptions options=new MarkerOptions().position(latLng).title("You are here");
         mMap.addMarker(new MarkerOptions()
                 .position(latLng)
-                .title("Your current location"));
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                .title("Your current location"))
+                ;
     }
-
     @Override
     public void onConnectionSuspended(int i) {
-
     }
-
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
-
     @Override
     public void onLocationChanged(Location location) {
         Log.i(TAG,"Location changed to " + location.toString());
