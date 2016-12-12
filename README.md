@@ -1,0 +1,1 @@
+LocReader - An application which fetches data from the Wiki API and shows nearby landmarks of a person on a map.
